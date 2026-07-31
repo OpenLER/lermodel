@@ -6,6 +6,9 @@ vha pydantic.
 På sigt skal den kunne repræsentere de forskellige versioner
 af LER, men lige nu er det kun 2.1.0.
 
+Se [VERSION_SUPPORT.md](VERSION_SUPPORT.md) for hvilke feature types der er
+understøttet.
+
 ## Usage
 
 ```python

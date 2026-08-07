@@ -1,7 +1,7 @@
 """
-Abstract base hierarchy for LER 2.1.0 features, modeled after the type
-hierarchy in 2.1_ler.xsd (ler-xml-validator's src/lerxml/xsd/2.1.0/2.1_ler.xsd,
-also vendored under featurekatalog/versions/2.1.0/schemas/).
+Abstract base hierarchy for LER 2.2.0 features, modeled after the type
+hierarchy in 2.2_ler.xsd (ler-xml-validator's src/lerxml/xsd/2.2.0/2.2_ler.xsd,
+also vendored under featurekatalog/versions/2.2.0/schemas/).
 
 These classes are never dispatched to directly (see dispatch.py) - they only
 exist to share fields/validation between concrete feature types, mirroring
@@ -12,6 +12,16 @@ slutkomponent, indeholdtLedning, tilknyttetLedning,
 kontaktprofilTilTekniskeSpoergsmaal) are not modeled: they are all optional
 in the schema, and cross-feature references aren't needed for the
 graveforespoergsel-svar use case this package was built for.
+
+Diff from lermodel.v2_1_0.base (2.1_ler.xsd -> 2.2_ler.xsd, confirmed by
+diffing both XSDs in full - no other differences affect this package's
+scope):
+- LedningEllerLedningstraceType and LedningskomponentType both gained
+  noejagtighedsklasseVertikal (optional, nillable, same NoejagtighedsklasseType
+  enum as noejagtighedsklasse - which itself was reworded from "placering"
+  to "horisontale placering" in its documentation, no behavioral change).
+- RoerledningType gained udnyttelsesgrad (optional decimal in [0, 1] with at
+  most 2 decimal places - a plain field, not a gml:MeasureType, so no uom).
 """
 
 from datetime import datetime
@@ -20,10 +30,10 @@ from typing import TYPE_CHECKING
 from pydantic import BaseModel, ConfigDict, field_validator
 from shapely.geometry.base import BaseGeometry
 
+from lermodel.v2_2_0 import enums
+
 if TYPE_CHECKING:
     from lxml import etree
-
-from lermodel.v2_1_0 import enums
 
 _ETABLERET_FOER_2023 = "Etableret før 1. juli 2023"
 
@@ -38,6 +48,14 @@ def _validate_etableringstidspunkt(v: str) -> str:
             f"etableringstidspunkt must be {_ETABLERET_FOER_2023!r} or in format "
             f"YYYY-MM-DD, got {v!r}"
         ) from None
+    return v
+
+
+def _validate_udnyttelsesgrad(v: float) -> float:
+    if not (0 <= v <= 1):
+        raise ValueError(f"udnyttelsesgrad must be between 0 and 1, got {v!r}")
+    if round(v, 2) != v:
+        raise ValueError(f"udnyttelsesgrad must have at most 2 decimal places, got {v!r}")
     return v
 
 
@@ -69,7 +87,7 @@ class AbstractFeatureType(AbstractGMLType):
     def to_xml(self) -> "etree._Element":
         # deferred import: xml.py imports AbstractFeatureType for type
         # hints, so importing it back at module level here would be circular
-        from lermodel.v2_1_0.xml import build_feature
+        from lermodel.v2_2_0.xml import build_feature
 
         return build_feature(self)
 
@@ -96,6 +114,7 @@ class LedningEllerLedningstraceType(AbstractFeatureType):
     indtegningsmetode: str | None = "nøjagtigt"
     # optional, nillable
     noejagtighedsklasse: str | None = None
+    noejagtighedsklasseVertikal: str | None = None
     # optional
     registreringFra: str | None = None
     sikkerhedshensyn: str | None = None
@@ -136,6 +155,15 @@ class LedningEllerLedningstraceType(AbstractFeatureType):
         if v is None:
             return v
         return enums.validate_enum(v, enums.NOEJAGTIGHEDSKLASSE, field_name="noejagtighedsklasse")
+
+    @field_validator("noejagtighedsklasseVertikal")
+    @classmethod
+    def _noejagtighedsklasseVertikal(cls, v: str | None) -> str | None:
+        if v is None:
+            return v
+        return enums.validate_enum(
+            v, enums.NOEJAGTIGHEDSKLASSE, field_name="noejagtighedsklasseVertikal"
+        )
 
     @field_validator("etableringstidspunkt")
     @classmethod
@@ -183,11 +211,17 @@ class LedningType(LedningEllerLedningstraceType):
 
 
 class RoerledningType(LedningType):
-    """Modeled after the abstract ler:RoerledningType."""
+    """
+    Modeled after the abstract ler:RoerledningType.
+
+    Field declaration order matches the XSD's <sequence> exactly - see the
+    note on LedningEllerLedningstraceType above.
+    """
 
     # required, nillable
     tvaersnitsform: str | None
-
+    # optional
+    udnyttelsesgrad: float | None = None  # ratio in [0, 1], not a gml:MeasureType
     # optional, nillable
     udvendigBredde: float | None = None  # mm
     udvendigHoejde: float | None = None  # mm
@@ -200,6 +234,13 @@ class RoerledningType(LedningType):
         return enums.validate_enum(
             v, enums.TVAERSNITSFORM, field_name="tvaersnitsform", allow_other=True
         )
+
+    @field_validator("udnyttelsesgrad")
+    @classmethod
+    def _udnyttelsesgrad(cls, v: float | None) -> float | None:
+        if v is None:
+            return v
+        return _validate_udnyttelsesgrad(v)
 
 
 class LedningskomponentType(AbstractFeatureType):
@@ -223,6 +264,7 @@ class LedningskomponentType(AbstractFeatureType):
     materiale: str | None = None
     # optional, nillable
     noejagtighedsklasse: str | None = None
+    noejagtighedsklasseVertikal: str | None = None
     # optional
     registreringFra: str | None = None
     sikkerhedshensyn: str | None = None
@@ -259,6 +301,15 @@ class LedningskomponentType(AbstractFeatureType):
         if v is None:
             return v
         return enums.validate_enum(v, enums.NOEJAGTIGHEDSKLASSE, field_name="noejagtighedsklasse")
+
+    @field_validator("noejagtighedsklasseVertikal")
+    @classmethod
+    def _noejagtighedsklasseVertikal(cls, v: str | None) -> str | None:
+        if v is None:
+            return v
+        return enums.validate_enum(
+            v, enums.NOEJAGTIGHEDSKLASSE, field_name="noejagtighedsklasseVertikal"
+        )
 
     @field_validator("niveau")
     @classmethod

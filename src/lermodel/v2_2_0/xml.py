@@ -11,7 +11,7 @@ from lxml.builder import ElementMaker
 from shapely.geometry import LineString, MultiLineString, Point
 from shapely.geometry.base import BaseGeometry
 
-from lermodel.v2_1_0.base import AbstractFeatureType
+from lermodel.v2_2_0.base import AbstractFeatureType
 
 # Same namespace across all LER versions - only the schemaVersion attribute
 # on the envelope root element changes between versions.
@@ -26,7 +26,9 @@ GML = ElementMaker(namespace=NSMAP["gml"])
 
 # Fields that are required-but-nillable in the XSD: the element must always
 # be present, but xsi:nil="true" is used in place of a value. All other
-# fields are simply omitted from the output when their value is None.
+# fields (including optional-and-nillable ones like noejagtighedsklasse and
+# noejagtighedsklasseVertikal) are simply omitted from the output when None
+# - that's also schema-valid, and simpler.
 REQUIRED_NILLABLE_FIELDS = {
     "driftsstatus",
     "fareklasse",
@@ -37,6 +39,9 @@ REQUIRED_NILLABLE_FIELDS = {
 # Fields typed as gml:MeasureType in the XSD: serialized as plain numeric
 # text plus a required "uom" attribute. Each field here is only ever
 # produced by lermodel in the single, fixed unit given below.
+#
+# udnyttelsesgrad (new in 2.2.0) is NOT here - it's a plain decimal in the
+# XSD, not a gml:MeasureType, so it has no uom and needs no special casing.
 MEASURE_FIELDS_UOM = {
     "spaendingsniveau": "kV",
     "udvendigDiameter": "mm",

@@ -1,4 +1,4 @@
-from lermodel.v2_1_0.base import (
+from lermodel.v2_2_0.base import (
     AbstractFeatureType,
     AbstractGMLType,
     LedningEllerLedningstraceType,
@@ -6,17 +6,16 @@ from lermodel.v2_1_0.base import (
     LedningType,
     RoerledningType,
 )
-from lermodel.v2_1_0.dispatch import FEATURE_TYPE_MAP, UnsupportedFeatureTypeError, to_lerfeat
-from lermodel.v2_1_0.featuretypes import ElkomponentType, ElledningType, FoeringsroerType
+from lermodel.v2_2_0.dispatch import FEATURE_TYPE_MAP, UnsupportedFeatureTypeError, to_lerfeat
+from lermodel.v2_2_0.featuretypes import ElkomponentType, ElledningType, FoeringsroerType
 
-SCHEMA_VERSION = "2.1.0"
+SCHEMA_VERSION = "2.2.0"
 
-# All concrete (non-abstract) feature types defined by the LER 2.1.0 XSD -
+# All concrete (non-abstract) feature types defined by the LER 2.2.0 XSD -
 # used by lermodel.support to report which ones are implemented here (see
-# clay/adr/944 in the sibling clay repo). Sourced from the complexType
-# names in 2.1_ler.xsd, excluding *PropertyType and abstract types, and
-# excluding GraveforespoergselssvarType (the response envelope, not a
-# ledning/komponent feature).
+# clay/adr/944 in the sibling clay repo). Identical to v2_1_0.ALL_FEATURE_TYPES
+# (confirmed by diffing the full complexType name lists of 2.1_ler.xsd and
+# 2.2_ler.xsd - no feature types were added or removed between versions).
 ALL_FEATURE_TYPES = (
     "Afloebskomponent",
     "Afloebsledning",

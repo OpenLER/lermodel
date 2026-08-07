@@ -10,9 +10,9 @@ from typing import Any, Mapping
 from shapely.geometry import shape
 
 from lermodel.errors import UnsupportedFeatureTypeError
-from lermodel.v2_1_0.base import AbstractFeatureType
-from lermodel.v2_1_0.coercion import coerce_properties
-from lermodel.v2_1_0.featuretypes import ElkomponentType, ElledningType, FoeringsroerType
+from lermodel.v2_2_0.base import AbstractFeatureType
+from lermodel.v2_2_0.coercion import coerce_properties
+from lermodel.v2_2_0.featuretypes import ElkomponentType, ElledningType, FoeringsroerType
 
 __all__ = ["FEATURE_TYPE_MAP", "UnsupportedFeatureTypeError", "to_lerfeat"]
 
@@ -28,7 +28,7 @@ FEATURE_TYPE_MAP: dict[str, type[AbstractFeatureType]] = {
 
 def to_lerfeat(feat: Mapping[str, Any]) -> AbstractFeatureType:
     """
-    Build the appropriate concrete LER 2.1.0 feature object from a
+    Build the appropriate concrete LER 2.2.0 feature object from a
     GeoJSON-like feature mapping (e.g. a fiona.model.Feature).
 
     Expected input:
@@ -50,7 +50,7 @@ def to_lerfeat(feat: Mapping[str, Any]) -> AbstractFeatureType:
     if cls is None:
         raise UnsupportedFeatureTypeError(
             f"Unsupported or not-yet-implemented feature_type: {feature_type!r}. "
-            f"Implemented feature types in lermodel.v2_1_0: {sorted(FEATURE_TYPE_MAP)}."
+            f"Implemented feature types in lermodel.v2_2_0: {sorted(FEATURE_TYPE_MAP)}."
         )
 
     props = coerce_properties(feature_type, props)

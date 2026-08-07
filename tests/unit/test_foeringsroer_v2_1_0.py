@@ -3,7 +3,7 @@ from copy import deepcopy
 import lerxml
 from lxml import etree
 
-from lermodel import to_lerfeat, to_xml
+from lermodel.v2_1_0 import to_lerfeat
 
 VALID = {
     "type": "Feature",
@@ -24,7 +24,7 @@ VALID = {
 
 def _to_valid_xml(feat):
     lerfeat = to_lerfeat(feat)
-    elm = to_xml(lerfeat)
+    elm = lerfeat.to_xml()
     report = lerxml.validate(etree.ElementTree(elm), version="2.1.0")
     assert report.valid, report.violations
     return lerfeat

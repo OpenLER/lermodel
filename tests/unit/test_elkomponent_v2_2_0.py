@@ -5,7 +5,7 @@ import pytest
 from lxml import etree
 from pydantic import ValidationError
 
-from lermodel import to_lerfeat, to_xml
+from lermodel.v2_2_0 import to_lerfeat
 
 VALID = {
     "type": "Feature",
@@ -23,8 +23,8 @@ VALID = {
 
 def _to_valid_xml(feat):
     lerfeat = to_lerfeat(feat)
-    elm = to_xml(lerfeat)
-    report = lerxml.validate(etree.ElementTree(elm), version="2.1.0")
+    elm = lerfeat.to_xml()
+    report = lerxml.validate(etree.ElementTree(elm), version="2.2.0")
     assert report.valid, report.violations
     return lerfeat
 
@@ -46,6 +46,14 @@ def test_elkomponent_with_optional_fields():
     assert lerfeat.spaendingsniveau == 10.0
 
 
+def test_elkomponent_noejagtighedsklasse_vertikal():
+    # new in 2.2.0 - not present at all in 2.1.0
+    feat = deepcopy(VALID)
+    feat["properties"]["noejagtighedsklasseVertikal"] = "<= 1.00 m"
+    lerfeat = _to_valid_xml(feat)
+    assert lerfeat.noejagtighedsklasseVertikal == "<= 1.00 m"
+
+
 def test_elkomponent_relativ_niveau_only_allowed_for_roerblok():
     # relativNiveau is a real LER field, but only legal when type=rørblok -
     # this is enforced by lerxml's schematron/xta rules, not by lermodel
@@ -56,8 +64,8 @@ def test_elkomponent_relativ_niveau_only_allowed_for_roerblok():
     feat = deepcopy(VALID)
     feat["properties"]["relativNiveau"] = "top"
     lerfeat = to_lerfeat(feat)
-    elm = to_xml(lerfeat)
-    report = lerxml.validate(etree.ElementTree(elm), version="2.1.0")
+    elm = lerfeat.to_xml()
+    report = lerxml.validate(etree.ElementTree(elm), version="2.2.0")
     assert not report.valid
     assert any(v.code == "relativNiveauTilladelse" for v in report.violations)
 

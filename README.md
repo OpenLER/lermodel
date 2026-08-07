@@ -55,3 +55,14 @@ svar = GraveforespoergselssvarType(
 )
 print(etree.tostring(svar.to_xml(), pretty_print=True).decode())
 ```
+
+eller
+
+```python
+svar = GraveforespoergselssvarType(
+    type="ledningsoplysninger udleveret",
+    gyldigTil="2026-12-31",
+)
+svar.ledningMember.append(feat1)
+svar.ledningMember.append(feat2)
+```

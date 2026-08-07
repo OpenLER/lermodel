@@ -7,7 +7,12 @@ from lermodel.v2_2_0.base import (
     RoerledningType,
 )
 from lermodel.v2_2_0.dispatch import FEATURE_TYPE_MAP, UnsupportedFeatureTypeError, to_lerfeat
-from lermodel.v2_2_0.featuretypes import ElkomponentType, ElledningType, FoeringsroerType
+from lermodel.v2_2_0.featuretypes import (
+    ElkomponentType,
+    ElledningType,
+    FoeringsroerType,
+    GraveforespoergselssvarType,
+)
 
 SCHEMA_VERSION = "2.2.0"
 
@@ -26,6 +31,7 @@ ALL_FEATURE_TYPES = (
     "Foeringsroer",
     "Gaskomponent",
     "Gasledning",
+    "Graveforespoergselssvar",
     "Informationsressource",
     "Kontaktprofil",
     "LedningUkendtForsyningsart",
@@ -52,6 +58,7 @@ __all__ = [
     "ElledningType",
     "FoeringsroerType",
     "ElkomponentType",
+    "GraveforespoergselssvarType",
     "FEATURE_TYPE_MAP",
     "UnsupportedFeatureTypeError",
     "to_lerfeat",

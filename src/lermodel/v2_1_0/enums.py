@@ -152,6 +152,17 @@ FORSYNINGSART = frozenset(
     }
 )
 
+GRAVEFORESPOERGSELSSVARTYPE = frozenset(
+    {
+        "ingen ledninger i graveområde",
+        "ledningsoplysninger udleveres ikke",
+        "ledningsoplysninger udleveret",
+        "udtaget til manuel behandling",
+        "udtaget til påvisning - ledningsoplysninger udleveres ikke",
+        "udtaget til påvisning - ledningsoplysninger udleveret",
+    }
+)
+
 # ler:*OtherType simple types across the schema all share this exact pattern.
 OTHER_PATTERN = re.compile(r"^other: \w{2,}$", re.UNICODE)
 

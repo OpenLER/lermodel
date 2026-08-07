@@ -50,6 +50,15 @@ MEASURE_FIELDS_UOM = {
     "vejledendeDybde": "m",
 }
 
+# List fields holding other feature type instances, per gml:AbstractFeatureMemberType:
+# each item is wrapped in its own <name> element, keeping the item's own tag
+# inside (e.g. <ledningMember><Elledning>...</Elledning></ledningMember>) -
+# unlike a plain list field, which repeats <name> once per item directly.
+MEMBER_LIST_FIELDS = {
+    "ledningMember",
+    "ledningskomponentMember",
+}
+
 
 def local_name_for_class(cls: type) -> str:
     name = cls.__name__
@@ -119,6 +128,8 @@ def serialize_field(name: str, value: Any) -> list[etree._Element]:
         return []
 
     if isinstance(value, list):
+        if name in MEMBER_LIST_FIELDS:
+            return [make_ler(name, build_feature(item)) for item in value]
         out: list[etree._Element] = []
         for item in value:
             out.extend(serialize_field(name, item))
@@ -143,9 +154,17 @@ def build_feature(obj: AbstractFeatureType, tag: str | None = None) -> etree._El
     XSD's <sequence> order - see base.py).
     """
     tag = tag or local_name_for_class(type(obj))
-    fields = obj.model_dump()
+    # dict(obj), not obj.model_dump(): model_dump() recursively dumps nested
+    # feature type instances (e.g. GraveforespoergselssvarType.ledningMember
+    # items) into plain dicts, but serialize_field() needs those to still be
+    # model instances to recurse into build_feature() for them.
+    fields = dict(obj)
 
     gml_id = fields.pop("gml_id", None)
+    # Only GraveforespoergselssvarType has this - an XML attribute, not a
+    # sequence element, so it's popped here rather than going through
+    # serialize_field(). No-op for every other feature type.
+    schema_version = fields.pop("schemaVersion", None)
 
     children: list[etree._Element] = []
     for name, value in fields.items():
@@ -154,4 +173,6 @@ def build_feature(obj: AbstractFeatureType, tag: str | None = None) -> etree._El
     elm = make_ler(tag, *children)
     if gml_id is not None:
         elm.set(etree.QName(NSMAP["gml"], "id"), gml_id)
+    if schema_version is not None:
+        elm.set("schemaVersion", schema_version)
     return elm

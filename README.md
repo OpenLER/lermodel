@@ -40,3 +40,18 @@ print(etree.tostring(xml_element, pretty_print=True).decode())
 Version-specific `to_lerfeat` is also available directly, e.g.
 `lermodel.v2_1_0.to_lerfeat(feat)`, for code that's already pinned to one
 version.
+
+`GraveforespoergselssvarType` wraps a set of already-built lerfeat objects
+into the full response envelope. It's constructed directly, not via
+`to_lerfeat` (it isn't read from a single source feature):
+
+```python
+from lermodel.v2_1_0 import GraveforespoergselssvarType
+
+svar = GraveforespoergselssvarType(
+    type="ledningsoplysninger udleveret",
+    gyldigTil="2026-12-31",
+    ledningMember=[lerfeat],
+)
+print(etree.tostring(svar.to_xml(), pretty_print=True).decode())
+```

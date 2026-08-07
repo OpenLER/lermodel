@@ -23,8 +23,12 @@ def generate_support_table() -> str:
         cells = []
         for version in versions:
             module = VERSIONS[version]
-            implemented = (
-                feature_type in module.ALL_FEATURE_TYPES and feature_type in module.FEATURE_TYPE_MAP
+            # "implemented" = there's a f"{feature_type}Type" class in this
+            # version's package - not tied to FEATURE_TYPE_MAP, since e.g.
+            # GraveforespoergselssvarType is implemented but never
+            # to_lerfeat()-dispatched (see featuretypes.py).
+            implemented = feature_type in module.ALL_FEATURE_TYPES and hasattr(
+                module, f"{feature_type}Type"
             )
             cells.append("✅" if implemented else "")
         rows.append(f"| {feature_type} | " + " | ".join(cells) + " |")

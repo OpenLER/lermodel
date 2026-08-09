@@ -7,7 +7,7 @@ name = "lermodel"
 version = "0.1.0"
 description = "Pydantic data model for LER (LedningsEjerRegister) features"
 authors = [
-    { name = "Your Name" }
+    { name = "Thomas Wessel", email = "mrvelle@gmail.com" }
 ]
 readme = "README.md"
 requires-python = ">=3.10"

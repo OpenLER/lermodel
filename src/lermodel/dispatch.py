@@ -7,7 +7,7 @@ a default.
 
 from typing import Any, Mapping
 
-from lermodel.registry import VERSIONS
+from lermodel.registry import get_version
 
 
 def to_lerfeat(feat: Mapping[str, Any], version: str) -> Any:
@@ -19,7 +19,4 @@ def to_lerfeat(feat: Mapping[str, Any], version: str) -> Any:
     package is an independent implementation (clay/adr/943) with its own,
     unrelated class hierarchy - there is no shared base class to name here.
     """
-    module = VERSIONS.get(version)
-    if module is None:
-        raise ValueError(f"Unsupported LER version: {version!r}. Supported: {sorted(VERSIONS)}.")
-    return module.to_lerfeat(feat)
+    return get_version(version).to_lerfeat(feat)

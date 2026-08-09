@@ -66,3 +66,18 @@ svar = GraveforespoergselssvarType(
 svar.ledningMember.append(feat1)
 svar.ledningMember.append(feat2)
 ```
+
+For kode, der skal fungere med dynamisk version, brug `lermodel.get_version(version)`
+til at slå det rigtige undermodul op - virker for enhver klasse, ikke kun
+`GraveforespoergselssvarType`:
+
+```python
+version = "2.2.0"
+svar = lermodel.get_version(version).GraveforespoergselssvarType(
+    type="ledningsoplysninger udleveret",
+    gyldigTil="2026-12-31",
+)
+for ffeat in fionafeats:
+    lerfeat = lermodel.to_lerfeat(ffeat, version)
+    svar.ledningMember.append(lerfeat)
+```

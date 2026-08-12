@@ -27,7 +27,7 @@ scope):
 from datetime import datetime
 from typing import TYPE_CHECKING
 
-from pydantic import BaseModel, ConfigDict, field_validator
+from pydantic import BaseModel, ConfigDict, field_validator, model_validator
 from shapely.geometry.base import BaseGeometry
 
 from lermodel.v2_2_0 import enums
@@ -208,6 +208,21 @@ class LedningType(LedningEllerLedningstraceType):
         return enums.validate_enum(
             v, enums.LEDNINGSETABLERINGSMETODE, field_name="ledningsetableringsmetode"
         )
+
+    @model_validator(mode="after")
+    def _noejagtighedsklasse_kraevet_ved_geometri(self) -> "LedningType":
+        # lerxml's xta restriktioner (ler:Ledning) require noejagtighedsklasse
+        # and noejagtighedsklasseVertikal iff geometri is set - not the plain
+        # optional the XSD alone implies.
+        if (self.geometri is None) != (self.noejagtighedsklasse is None):
+            raise ValueError(
+                "noejagtighedsklasse must be set if and only if geometri is set"
+            )
+        if (self.geometri is None) != (self.noejagtighedsklasseVertikal is None):
+            raise ValueError(
+                "noejagtighedsklasseVertikal must be set if and only if geometri is set"
+            )
+        return self
 
 
 class RoerledningType(LedningType):

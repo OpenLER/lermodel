@@ -14,6 +14,7 @@ FEAT = {
         "etableringstidspunkt": "2014-12-01",
         "fareklasse": "farlig",
         "type": "luftledning",
+        "noejagtighedsklasse": "<= 2.00 m",
     },
     "geometry": {"type": "LineString", "coordinates": [[0, 0], [1, 1]]},
 }
@@ -25,7 +26,11 @@ def test_routes_to_2_1_0():
 
 
 def test_routes_to_2_2_0():
-    result = lermodel.to_lerfeat(FEAT, "2.2.0")
+    feat = {
+        "properties": {**FEAT["properties"], "noejagtighedsklasseVertikal": "<= 2.00 m"},
+        "geometry": FEAT["geometry"],
+    }
+    result = lermodel.to_lerfeat(feat, "2.2.0")
     assert isinstance(result, ElledningType_2_2_0)
 
 

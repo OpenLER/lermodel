@@ -10,6 +10,7 @@ VALID_ELLEDNING = {
         "etableringstidspunkt": "2014-12-01",
         "fareklasse": "farlig",
         "type": "luftledning",
+        "noejagtighedsklasse": "<= 2.00 m",
     },
     "geometry": {"type": "LineString", "coordinates": [[0, 0], [1, 1]]},
 }

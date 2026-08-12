@@ -64,17 +64,14 @@ def test_elledning_noejagtighedsklasse_vertikal():
     assert lerfeat.noejagtighedsklasseVertikal == "<= 1.00 m"
 
 
-def test_elledning_missing_noejagtighedsklasse_vertikal_is_schematron_invalid():
+def test_elledning_missing_noejagtighedsklasse_vertikal_raises():
     # required whenever geometry is present (nøjagtighedsklasseVertikalBetingelse)
-    # - a cross-field schematron/xta rule, deliberately not enforced by
-    # lermodel itself (see clay/adr/913 in the sibling clay repo).
+    # - lermodel now enforces this itself (see clay/adr/913 in the sibling
+    # clay repo), rather than letting it slip through to lerxml.
     feat = deepcopy(VALID)
     del feat["properties"]["noejagtighedsklasseVertikal"]
-    lerfeat = to_lerfeat(feat)
-    elm = lerfeat.to_xml()
-    report = lerxml.validate(etree.ElementTree(elm), version="2.2.0")
-    assert not report.valid
-    assert any(v.code == "nøjagtighedsklasseVertikalBetingelse" for v in report.violations)
+    with pytest.raises(ValidationError):
+        to_lerfeat(feat)
 
 
 def test_elledning_invalid_noejagtighedsklasse_vertikal_raises():

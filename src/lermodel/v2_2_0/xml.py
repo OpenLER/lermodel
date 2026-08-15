@@ -19,6 +19,12 @@ NSMAP = {
     "ler": "http://data.gov.dk/schemas/LER/2/gml",
     "gml": "http://www.opengis.net/gml/3.2",
     "xsi": "http://www.w3.org/2001/XMLSchema-instance",
+    # Never referenced directly below: gml:AssociationAttributeGroup (used by
+    # e.g. ler:geometri's type) carries a fixed xlink:type="simple" default
+    # attribute, and LER's real server rejects documents that don't declare
+    # this prefix even though it's schema-legal to omit (featurekatalog
+    # general_constraints G4).
+    "xlink": "http://www.w3.org/1999/xlink",
 }
 
 LER = ElementMaker(namespace=NSMAP["ler"], nsmap=NSMAP)

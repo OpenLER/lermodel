@@ -1,7 +1,7 @@
 """
 Abstract base hierarchy for LER 2.2.0 features, modeled after the type
 hierarchy in 2.2_ler.xsd (ler-xml-validator's src/lerxml/xsd/2.2.0/2.2_ler.xsd,
-also vendored under featurekatalog/versions/2.2.0/schemas/).
+also vendored under lerbogen/versions/2.2.0/schemas/).
 
 These classes are never dispatched to directly (see dispatch.py) - they only
 exist to share fields/validation between concrete feature types, mirroring
